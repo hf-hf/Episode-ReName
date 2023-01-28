@@ -7,6 +7,7 @@ import sys
 import time
 from datetime import datetime
 from itertools import product
+# import shutil
 
 from utils.resolution_util import get_resolution_in_name
 
@@ -809,6 +810,7 @@ for old, new in file_lists:
         # 检测文件能否重命名 报错直接忽略
         tmp_name = new + '.new'
         os.rename(old, tmp_name)
+        # shutil.copy(old, tmp_name)
 
         # 目标文件已存在, 先删除
         if os.path.exists(new):
@@ -816,8 +818,18 @@ for old, new in file_lists:
 
         # 临时文件重命名
         os.rename(tmp_name, new)
-    except:
+    except Exception as msg:
         pass
+
+# 如果原父目录为空，则删除
+for home, dir, file in os.walk(target_path):
+    if len(os.listdir(home)) == 0:
+        print(home)
+if len(file_lists) > 0:
+    for home, dir, file in os.walk(target_path):
+        if len(os.listdir(home)) == 0:
+            os.rmdir(home)
+            logger.info(f'空文件夹删除成功...{home}')
 
 if error_logs:
     error_file = os.path.join(application_path, 'error.txt')
